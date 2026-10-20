@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1r0nkmi" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.51.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.24.0">
+  <bpmn:process id="withdrawal-request" name="Retirement Withdrawal Request" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:serviceTask id="Activity_1yykcbo" name="Notify customer : rejected" camunda:expression="${notificationService.send(execution, &#39;REJECTED&#39;)}">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_0vv1esa</bpmn:incoming>
+      <bpmn:outgoing>Flow_076cnkh</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_055s8v1" name="Withdrawal rejected">
+      <bpmn:incoming>Flow_076cnkh</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_076cnkh" sourceRef="Activity_1yykcbo" targetRef="Event_055s8v1" />
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_04xhuoo</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1b0p848" name="Validate request" camunda:delegateExpression="${validateRequestDelegate}">
+      <bpmn:incoming>Flow_04xhuoo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rpy5sv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_04xhuoo" sourceRef="StartEvent_1" targetRef="Activity_1b0p848" />
+    <bpmn:boundaryEvent id="INVALID_REQUEST" name="Invalid request" attachedToRef="Activity_1b0p848">
+      <bpmn:outgoing>Flow_0vv1esa</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1yzh9py" errorRef="Error_0x7l9zq" camunda:errorCodeVariable="INVALID_REQUEST" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0vv1esa" sourceRef="INVALID_REQUEST" targetRef="Activity_1yykcbo" />
+    <bpmn:parallelGateway id="Gateway_0mo004t">
+      <bpmn:incoming>Flow_0rpy5sv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hc7uy1</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0lyt65q</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0rpy5sv" sourceRef="Activity_1b0p848" targetRef="Gateway_0mo004t" />
+    <bpmn:serviceTask id="Activity_05j69eo" name="Score fraud risk" camunda:delegateExpression="${fraudCheckDelegate}">
+      <bpmn:incoming>Flow_1hc7uy1</bpmn:incoming>
+      <bpmn:outgoing>Flow_09fmg83</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1hc7uy1" sourceRef="Gateway_0mo004t" targetRef="Activity_05j69eo" />
+    <bpmn:serviceTask id="Activity_02k4q2l" name="Check available balance" camunda:delegateExpression="${balanceCheckDelegate}">
+      <bpmn:incoming>Flow_0lyt65q</bpmn:incoming>
+      <bpmn:outgoing>Flow_0up0xva</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0lyt65q" sourceRef="Gateway_0mo004t" targetRef="Activity_02k4q2l" />
+    <bpmn:parallelGateway id="Gateway_1nqh7hk">
+      <bpmn:incoming>Flow_09fmg83</bpmn:incoming>
+      <bpmn:incoming>Flow_0up0xva</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wuus3u</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_09fmg83" sourceRef="Activity_05j69eo" targetRef="Gateway_1nqh7hk" />
+    <bpmn:sequenceFlow id="Flow_0up0xva" sourceRef="Activity_02k4q2l" targetRef="Gateway_1nqh7hk" />
+    <bpmn:endEvent id="Event_1urrdr0" name="Request accepted">
+      <bpmn:incoming>Flow_1wuus3u</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1wuus3u" sourceRef="Gateway_1nqh7hk" targetRef="Event_1urrdr0" />
+  </bpmn:process>
+  <bpmn:error id="Error_0x7l9zq" name="INVALID_REQUEST" errorCode="INVALID_REQUEST" camunda:errorMessage="INVALID_REQUEST" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="withdrawal-request">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1b0p848_di" bpmnElement="Activity_1b0p848">
+        <dc:Bounds x="270" y="180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1yykcbo_di" bpmnElement="Activity_1yykcbo">
+        <dc:Bounds x="270" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_055s8v1_di" bpmnElement="Event_055s8v1">
+        <dc:Bounds x="422" y="412" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="413" y="455" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0mo004t_di" bpmnElement="Gateway_0mo004t">
+        <dc:Bounds x="425" y="195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02k4q2l_di" bpmnElement="Activity_02k4q2l">
+        <dc:Bounds x="530" y="290" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05j69eo_di" bpmnElement="Activity_05j69eo">
+        <dc:Bounds x="530" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1nqh7hk_di" bpmnElement="Gateway_1nqh7hk">
+        <dc:Bounds x="685" y="195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1urrdr0_di" bpmnElement="Event_1urrdr0">
+        <dc:Bounds x="792" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="766" y="245" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_06huq21_di" bpmnElement="INVALID_REQUEST">
+        <dc:Bounds x="302" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="284" y="285" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_04xhuoo_di" bpmnElement="Flow_04xhuoo">
+        <di:waypoint x="218" y="220" />
+        <di:waypoint x="270" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rpy5sv_di" bpmnElement="Flow_0rpy5sv">
+        <di:waypoint x="370" y="220" />
+        <di:waypoint x="425" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vv1esa_di" bpmnElement="Flow_0vv1esa">
+        <di:waypoint x="320" y="278" />
+        <di:waypoint x="320" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_076cnkh_di" bpmnElement="Flow_076cnkh">
+        <di:waypoint x="370" y="430" />
+        <di:waypoint x="422" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hc7uy1_di" bpmnElement="Flow_1hc7uy1">
+        <di:waypoint x="450" y="195" />
+        <di:waypoint x="450" y="120" />
+        <di:waypoint x="530" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lyt65q_di" bpmnElement="Flow_0lyt65q">
+        <di:waypoint x="450" y="245" />
+        <di:waypoint x="450" y="330" />
+        <di:waypoint x="530" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09fmg83_di" bpmnElement="Flow_09fmg83">
+        <di:waypoint x="630" y="120" />
+        <di:waypoint x="710" y="120" />
+        <di:waypoint x="710" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0up0xva_di" bpmnElement="Flow_0up0xva">
+        <di:waypoint x="630" y="330" />
+        <di:waypoint x="710" y="330" />
+        <di:waypoint x="710" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wuus3u_di" bpmnElement="Flow_1wuus3u">
+        <di:waypoint x="735" y="220" />
+        <di:waypoint x="792" y="220" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
