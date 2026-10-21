@@ -1,5 +1,8 @@
 camunda:
   bpm:
+    generic-properties:
+      properties:
+        history-time-to-live: P180D
     admin-user:
       id: demo
       password: demo

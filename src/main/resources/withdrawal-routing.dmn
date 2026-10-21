@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0lth03r" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.51.1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.9.0">
+  <decision id="withdrawal-routing" name="Decision 1">
+    <variable id="Variable_1" name="Decision 1" typeRef="Any" />
+    <decisionTable id="DecisionTable_00kossc" hitPolicy="FIRST">
+      <input id="Input_1" label="Sufficient funds">
+        <inputExpression id="InputExpression_1" typeRef="boolean">
+          <text>sufficientFunds</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1uwxq5d" label="Fraud score">
+        <inputExpression id="LiteralExpression_1qzhvmv" typeRef="number">
+          <text>fraudScore</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1odge01" label="Withdrawal type">
+        <inputExpression id="LiteralExpression_1wjja1k" typeRef="string">
+          <text>withdrawalType</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0122fwh" label="Amount">
+        <inputExpression id="LiteralExpression_1i6tht0" typeRef="number">
+          <text>amount</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Route" name="route" typeRef="string" />
+      <output id="OutputClause_1ax6zuy" label="Reason" name="reason" typeRef="string" />
+      <rule id="DecisionRule_1sjjlvn">
+        <inputEntry id="UnaryTests_0t40v98">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ohqk8c">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1xl95tx">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1e794bf">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_034i8ho">
+          <text>"REJECT"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0hylmyu">
+          <text>"Insufficient funds"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0aln58y">
+        <inputEntry id="UnaryTests_1z0q0ip">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ue3n1e">
+          <text>&gt;=80</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0h4mbqb">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_13wyuco">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0u7u33z">
+          <text>"REJECT"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0getsl2">
+          <text>"High fraud risk"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0u6pi5w">
+        <inputEntry id="UnaryTests_057ok6y">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1qaszkm">
+          <text>&gt;=50</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ypwc2d">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ubni2w">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0esxhxh">
+          <text>"MANUAL_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_19kkhmv">
+          <text>"Elevated fraud score"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1cvnd0y">
+        <inputEntry id="UnaryTests_1axge6o">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_10bl40k">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_11xycu5">
+          <text>"HARDSHIP"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_111oke4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_03tkfhl">
+          <text>"MANUAL_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0elq5at">
+          <text>"Hardship requires review"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_00dcwba">
+        <inputEntry id="UnaryTests_16jffnz">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1st4co8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1t9xoub">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_11bla9v">
+          <text>&gt;=10000</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_00gp07w">
+          <text>"MANUAL_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_05r6b54">
+          <text>"Large amount"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1roml28">
+        <inputEntry id="UnaryTests_0xxvfwr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0mj4xnl">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0kokc42">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_06z5ar7">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1vruw1f">
+          <text>"AUTO_APPROVE"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_019hnox">
+          <text>"Within auto limits"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape id="Decision_1sszeos_di" dmnElementRef="withdrawal-routing">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
