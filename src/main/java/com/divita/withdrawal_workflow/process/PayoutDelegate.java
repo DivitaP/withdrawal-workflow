@@ -1,5 +1,6 @@
 package com.divita.withdrawal_workflow.process;
 
+import com.divita.withdrawal_workflow.domain.HoldService;
 import com.divita.withdrawal_workflow.domain.PayoutService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -11,9 +12,11 @@ import java.math.BigDecimal;
 public class PayoutDelegate implements JavaDelegate {
 
     private final PayoutService payoutService;
+    private final HoldService holdService;
 
-    public PayoutDelegate(PayoutService payoutService) {
+    public PayoutDelegate(PayoutService payoutService, HoldService holdService) {
         this.payoutService = payoutService;
+        this.holdService = holdService;
     }
 
     @Override
@@ -23,6 +26,11 @@ public class PayoutDelegate implements JavaDelegate {
         BigDecimal amount = new BigDecimal(execution.getVariable("amount").toString());
 
         String txnId = payoutService.pay(requestId, accountId, amount);
+
+        Object holdId = execution.getVariable("holdId");
+        if (holdId != null) {
+            holdService.captureHold(requestId, (String) holdId);
+        }
 
         if (payoutService.shouldCrashAfterPay()) {
             throw new RuntimeException("Simulated crash after payout");
