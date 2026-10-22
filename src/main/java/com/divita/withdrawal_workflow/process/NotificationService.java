@@ -16,4 +16,8 @@ public class NotificationService {
         log.info("Notify customer [{}]: {} {}", execution.getProcessBusinessKey(), outcome,
                 reason == null ? "" : "- " + reason);
     }
+
+    public void escalate(DelegateExecution execution, String reason) {
+        log.warn("Escalate review [{}]: {}", execution.getProcessBusinessKey(), reason);
+    }
 }
