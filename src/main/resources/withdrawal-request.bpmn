@@ -6,10 +6,10 @@
       <bpmn:incoming>Flow_1kn1mia</bpmn:incoming>
       <bpmn:outgoing>Flow_076cnkh</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:endEvent id="Event_055s8v1" name="Withdrawal rejected">
+    <bpmn:endEvent id="endRejected" name="Withdrawal rejected">
       <bpmn:incoming>Flow_076cnkh</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_076cnkh" sourceRef="Activity_1yykcbo" targetRef="Event_055s8v1" />
+    <bpmn:sequenceFlow id="Flow_076cnkh" sourceRef="Activity_1yykcbo" targetRef="endRejected" />
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_04xhuoo</bpmn:outgoing>
     </bpmn:startEvent>
@@ -79,7 +79,7 @@
       <bpmn:incoming>Flow_0m8qtz7</bpmn:incoming>
       <bpmn:outgoing>Flow_0dajj9t</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_0fczj5t" name="Manual review" sourceRef="Gateway_1gwz3h7" targetRef="Activity_1eudlbo">
+    <bpmn:sequenceFlow id="Flow_0fczj5t" name="Manual review" sourceRef="Gateway_1gwz3h7" targetRef="placeHold">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${route == 'MANUAL_REVIEW'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_1tkl0vt" name="Approved?" default="Flow_0ys95oz">
@@ -102,43 +102,43 @@
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:boundaryEvent>
-    <bpmn:serviceTask id="Activity_0k664m8" name="Escalate review" camunda:expression="${notificationService.escalate(execution, &#39;Review SLA breached&#39;)}">
+    <bpmn:serviceTask id="escalateReview" name="Escalate review" camunda:expression="${notificationService.escalate(execution, &#39;Review SLA breached&#39;)}">
       <bpmn:incoming>Flow_1dy7o2r</bpmn:incoming>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1dy7o2r" sourceRef="Event_0v0m2h3" targetRef="Activity_0k664m8" />
+    <bpmn:sequenceFlow id="Flow_1dy7o2r" sourceRef="Event_0v0m2h3" targetRef="escalateReview" />
     <bpmn:exclusiveGateway id="Gateway_1hk4ho3" name="Approved merge">
       <bpmn:incoming>Flow_1s5exnz</bpmn:incoming>
       <bpmn:incoming>Flow_0rs1lcs</bpmn:incoming>
       <bpmn:outgoing>Flow_0sspxwl</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Activity_1fwexw1" name="Execute payout" camunda:asyncBefore="true" camunda:delegateExpression="${payoutDelegate}">
+    <bpmn:serviceTask id="executePayout" name="Execute payout" camunda:asyncBefore="true" camunda:delegateExpression="${payoutDelegate}">
       <bpmn:extensionElements>
         <camunda:failedJobRetryTimeCycle>R3/PT10S</camunda:failedJobRetryTimeCycle>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0sspxwl</bpmn:incoming>
       <bpmn:outgoing>Flow_1bz6y5g</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0sspxwl" sourceRef="Gateway_1hk4ho3" targetRef="Activity_1fwexw1" />
-    <bpmn:endEvent id="Event_14g9bw5" name="Withdrawal paid">
+    <bpmn:sequenceFlow id="Flow_0sspxwl" sourceRef="Gateway_1hk4ho3" targetRef="executePayout" />
+    <bpmn:endEvent id="endPaid" name="Withdrawal paid">
       <bpmn:incoming>Flow_1bz6y5g</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1bz6y5g" sourceRef="Activity_1fwexw1" targetRef="Event_14g9bw5" />
-    <bpmn:sequenceFlow id="Flow_0m8qtz7" sourceRef="Activity_1eudlbo" targetRef="reviewWithdrawal" />
-    <bpmn:serviceTask id="Activity_1eudlbo" name="Place hold" camunda:delegateExpression="${placeHoldDelegate}">
+    <bpmn:sequenceFlow id="Flow_1bz6y5g" sourceRef="executePayout" targetRef="endPaid" />
+    <bpmn:sequenceFlow id="Flow_0m8qtz7" sourceRef="placeHold" targetRef="reviewWithdrawal" />
+    <bpmn:serviceTask id="placeHold" name="Place hold" camunda:delegateExpression="${placeHoldDelegate}">
       <bpmn:incoming>Flow_0fczj5t</bpmn:incoming>
       <bpmn:outgoing>Flow_0m8qtz7</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:boundaryEvent id="Event_0cpu1hx" name="Undo hold" attachedToRef="Activity_1eudlbo">
+    <bpmn:boundaryEvent id="Event_0cpu1hx" name="Undo hold" attachedToRef="placeHold">
       <bpmn:compensateEventDefinition id="CompensateEventDefinition_1nx0z8q" />
     </bpmn:boundaryEvent>
-    <bpmn:serviceTask id="Activity_1x3k4dx" name="Release hold" isForCompensation="true" camunda:delegateExpression="${releaseHoldDelegate}" />
+    <bpmn:serviceTask id="releaseHold" name="Release hold" isForCompensation="true" camunda:delegateExpression="${releaseHoldDelegate}" />
     <bpmn:sequenceFlow id="Flow_1vokeat" sourceRef="Event_1c5l24f" targetRef="Gateway_0uvhgne" />
     <bpmn:intermediateThrowEvent id="Event_1c5l24f" name="Release hold">
       <bpmn:incoming>Flow_0ys95oz</bpmn:incoming>
       <bpmn:outgoing>Flow_1vokeat</bpmn:outgoing>
       <bpmn:compensateEventDefinition id="CompensateEventDefinition_0c0j398" />
     </bpmn:intermediateThrowEvent>
-    <bpmn:association id="Association_01w4hac" associationDirection="One" sourceRef="Event_0cpu1hx" targetRef="Activity_1x3k4dx" />
+    <bpmn:association id="Association_01w4hac" associationDirection="One" sourceRef="Event_0cpu1hx" targetRef="releaseHold" />
   </bpmn:process>
   <bpmn:error id="Error_0x7l9zq" name="INVALID_REQUEST" errorCode="INVALID_REQUEST" camunda:errorMessage="rejectionReason" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -181,7 +181,7 @@
         <dc:Bounds x="150" y="570" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_055s8v1_di" bpmnElement="Event_055s8v1">
+      <bpmndi:BPMNShape id="Event_055s8v1_di" bpmnElement="endRejected">
         <dc:Bounds x="182" y="738" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="173" y="781" width="55" height="27" />
@@ -197,7 +197,7 @@
           <dc:Bounds x="613" y="915" width="54" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0k664m8_di" bpmnElement="Activity_0k664m8">
+      <bpmndi:BPMNShape id="Activity_0k664m8_di" bpmnElement="escalateReview">
         <dc:Bounds x="970" y="960" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
@@ -207,21 +207,21 @@
           <dc:Bounds x="859" y="802" width="82" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1fwexw1_di" bpmnElement="Activity_1fwexw1">
+      <bpmndi:BPMNShape id="Activity_1fwexw1_di" bpmnElement="executePayout">
         <dc:Bounds x="1140" y="730" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_14g9bw5_di" bpmnElement="Event_14g9bw5">
+      <bpmndi:BPMNShape id="Event_14g9bw5_di" bpmnElement="endPaid">
         <dc:Bounds x="1462" y="752" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1441" y="795" width="79" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1xw2b39_di" bpmnElement="Activity_1eudlbo">
+      <bpmndi:BPMNShape id="Activity_1xw2b39_di" bpmnElement="placeHold">
         <dc:Bounds x="1050" y="570" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ccumek_di" bpmnElement="Activity_1x3k4dx">
+      <bpmndi:BPMNShape id="Activity_0ccumek_di" bpmnElement="releaseHold">
         <dc:Bounds x="1050" y="410" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>

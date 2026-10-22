@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+camunda:
+  bpm:
+    job-execution:
+      enabled: false
+    generic-properties:
+      properties:
+        history-time-to-live: P180D
